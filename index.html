@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -87,6 +87,97 @@
     dbRef.on("value", function(snapshot) {
       var value = snapshot.val();
       dustbinChart.data.datasets[0].data[0] = value;
+      dustbinChart.update();
+    });
+  </script>
+</body>
+</html>
+
+ -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Dustbin Dashboard</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      margin-bottom: 40px;
+    }
+    #chart-container {
+      width: 90%;
+      max-width: 1000px;
+      margin: auto;
+    }
+    canvas {
+      width: 100% !important;
+      height: 500px !important; /* makes graph tall */
+    }
+  </style>
+</head>
+<body>
+  <h1>Smart Dustbin Fill Level Dashboard</h1>
+  <div id="chart-container">
+    <canvas id="dustbinChart"></canvas>
+  </div>
+
+  <script>
+    // ✅ Firebase config (yours)
+    var firebaseConfig = {
+      apiKey: "AIzaSyCFUCHHLM-bs-YDmm5OC8avr1k3bv7ScW8",
+      authDomain: "smartdustbin-e4945.firebaseapp.com",
+      databaseURL: "https://smartdustbin-e4945-default-rtdb.firebaseio.com",
+      projectId: "smartdustbin-e4945",
+      storageBucket: "smartdustbin-e4945.appspot.com",
+      messagingSenderId: "142631538244",
+      appId: "1:142631538244:web:57e9c2ed2c04ad11f0b611",
+      measurementId: "G-WK59Z2THVR"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // Chart.js setup
+    var ctx = document.getElementById('dustbinChart').getContext('2d');
+    var dustbinChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Bin 1 (Live)', 'Bin 2 (Dummy)', 'Bin 3 (Dummy)'],
+        datasets: [{
+          label: 'Fill Level (%)',
+          data: [0, 65, 20], // Bin 2 and 3 dummy values
+          backgroundColor: ['green', 'grey', 'grey']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100
+          }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+
+    // 🔄 Live Update for Bin 1
+    var dbRef = firebase.database().ref("dustbin/bin1/fillLevel");
+    dbRef.on("value", function(snapshot) {
+      var value = snapshot.val();
+      console.log("Bin 1 value from Firebase:", value);
+      dustbinChart.data.datasets[0].data[0] = value;
+      dustbinChart.data.datasets[0].backgroundColor[0] = value > 80 ? "red" : (value > 50 ? "orange" : "green"); 
       dustbinChart.update();
     });
   </script>
